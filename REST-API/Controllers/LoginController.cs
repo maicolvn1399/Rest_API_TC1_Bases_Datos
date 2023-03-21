@@ -5,7 +5,7 @@ namespace REST_API.Controllers
 {
 
     [ApiController]
-    [Route("api/login")]
+    [Route("api")]
     public class LoginController : ControllerBase
     {
 
@@ -37,9 +37,6 @@ namespace REST_API.Controllers
             worker.password = worker_credentials.password;
             JSON_Object json = new JSON_Object("ok", worker);
             return Ok(json);
-
-
-
         }
     }
 }
