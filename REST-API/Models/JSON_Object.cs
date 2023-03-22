@@ -2,7 +2,6 @@
 {
     public class JSON_Object
     {
-
         public string status { get; set; } = string.Empty;
         public Object result { get; set; }
 

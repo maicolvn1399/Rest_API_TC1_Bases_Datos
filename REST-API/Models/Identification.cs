@@ -2,6 +2,7 @@
 {
     public class Identification
     {
-        public string cedula {  get; set; } = string.Empty;
+        public string cedula { get; set; } = string.Empty;
+
     }
 }
