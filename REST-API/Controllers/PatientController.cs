@@ -46,6 +46,34 @@ namespace REST_API.Controllers
 
         }
 
+        [HttpGet("get_phone")]
+        public async Task<ActionResult<JSON_Object>> GetPhone([FromQuery] Identification identification)
+        {
+            //Se busca los números de telefono para obtener los telefonos de una persona
+            PatientPhone patientPhone = new PatientPhone();
+            patientPhone.telefono = "85859656";
+            JSON_Object json = new JSON_Object("ok", patientPhone);
+            return Ok(json);
+
+        }
+
+        [HttpPost("add_phone")]
+        public async Task<ActionResult<JSON_Object>> AddPhone(NewPatientPhone newPatientPhone)
+        {
+            //añadir el telefono con la cedula del paciente en la base 
+            JSON_Object json = new JSON_Object("ok",newPatientPhone);
+            return Ok(json);
+
+        }
+
+        [HttpDelete("delete_phone")]
+        public async Task<ActionResult<JSON_Object>> DeletePhone(NewPatientPhone deletePatientPhone)
+        {
+            //añadir el telefono con la cedula del paciente en la base 
+            JSON_Object json = new JSON_Object("ok", deletePatientPhone);
+            return Ok(json);
+
+        }
 
 
     }
