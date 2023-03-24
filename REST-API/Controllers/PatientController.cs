@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using REST_API.Models;
+using REST_API.Resources;
 
 namespace REST_API.Controllers
 {
@@ -11,10 +12,24 @@ namespace REST_API.Controllers
         [HttpPost("create_patient")]
         public async Task<ActionResult<JSON_Object>> CreatePatient(Patient new_patient)
         {
-            //Se guarda el paciente nuevo en la base
-            Console.WriteLine(new_patient);
             JSON_Object json = new JSON_Object("ok", null);
-            return Ok(json);
+
+            bool var = DatabaseConnection.ExecuteAddPatient(new_patient);
+            Console.WriteLine(var);
+            if (var)
+            {
+                return Ok(json);
+            }
+            else
+            {
+                json.status = "error";
+                return BadRequest(json);
+            }
+            
+            
+
+
+
         }
 
         [HttpPut("update_patient")]

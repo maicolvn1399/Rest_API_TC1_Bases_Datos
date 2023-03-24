@@ -2,14 +2,14 @@
 {
     public class Patient
     {
-        public string cedula { get; set; }
-        public string password { get; set; }
-        public string nombre { get; set; }
-        public string apellido_1 { get; set; }
-        public string apellido_2 { get; set; }
-        public DateTime fecha_nac { get; set; } //Puede dar problemas **
-        public char sexo { get; set; }
-        public int edad { get; set; }
+        public string cedula { get; set; } = string.Empty;
+        public string password { get; set; } = string.Empty;
+        public string nombre { get; set; } = string.Empty;
+        public string apellido_1 { get; set; } = string.Empty;
+        public string apellido_2 { get; set; } = string.Empty;
+        public string fecha_nac { get; set; }
+        public string sexo { get; set; } = string.Empty;
+        public int edad { get; set; } = 0;
         public List<string> telefono { get; set; }
         public List<Direccion> direccion { get; set; }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using REST_API.Models;
+using System.Linq.Expressions;
 
 namespace REST_API.Controllers
 {
@@ -14,6 +15,18 @@ namespace REST_API.Controllers
         {
             //revisa en la base de datos si existe el paciente y retorna la informacion del paciente
             Patient patient = new Patient();
+            patient.cedula = "3052220111";
+            patient.password = "password";
+            patient.nombre = "marco";
+            patient.apellido_1 = "mora";
+            patient.apellido_2 = "lopez";
+            patient.fecha_nac = "13/10/1990";
+            patient.sexo = "masculino";
+            patient.edad = 30;
+            patient.telefono = new List<string>
+            {
+                "25481010"
+            };
             Direccion direc = new Direccion();
             direc.provincia = "cartago";
             direc.canton = "centraal";

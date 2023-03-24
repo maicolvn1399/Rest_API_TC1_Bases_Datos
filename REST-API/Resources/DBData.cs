@@ -5,7 +5,7 @@ namespace REST_API.Resources
 {
     public class DBData
     {
-        public static string cadenaConexion = "Data Source=.;Initial Catalog=Test;User ID=angels;Password=123.";
+        public static string cadenaConexion = "Data Source=LAPTOP_MICHAEL;Initial Catalog=Tarea_Corta_1;Persist Security Info=True;User ID=michael;Password=abc13";
         public static DataSet ListarTablas(string nombreProcedimiento, List<Parametro> parametros = null)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -43,7 +43,7 @@ namespace REST_API.Resources
         public static DataTable Listar(string nombreProcedimiento, List<Parametro> parametros = null)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
-
+            
             try
             {
                 conexion.Open();
@@ -77,10 +77,12 @@ namespace REST_API.Resources
         public static bool Ejecutar(string nombreProcedimiento, List<Parametro> parametros = null)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
+            Console.WriteLine("Ejecutar metodo");
 
             try
             {
                 conexion.Open();
+                Console.WriteLine("open");
                 SqlCommand cmd = new SqlCommand(nombreProcedimiento, conexion);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
@@ -88,6 +90,7 @@ namespace REST_API.Resources
                 {
                     foreach (var parametro in parametros)
                     {
+                        Console.WriteLine(parametro.Nombre);
                         cmd.Parameters.AddWithValue(parametro.Nombre, parametro.Valor);
                     }
                 }
@@ -98,7 +101,9 @@ namespace REST_API.Resources
             }
             catch (Exception ex)
             {
+                Console.WriteLine("checkpoint");
                 return false;
+                
             }
             finally
             {
