@@ -122,7 +122,6 @@ namespace REST_API.Resources
             {
                 conn.Close();
             }
-
         }
 
 
@@ -188,15 +187,12 @@ namespace REST_API.Resources
             {
                 Console.WriteLine(ex.Message);
                 return false;
-
             }
             finally
             {
-
                 conn.Close();
             }
         }
-
 
 
         public static bool ExecuteUpdateClinicalHistory(UpdatedClinicalHistory updatedClinicalHistory)
@@ -237,7 +233,6 @@ namespace REST_API.Resources
             }
             finally
             {
-
                 conn.Close();
             }
 
@@ -356,7 +351,6 @@ namespace REST_API.Resources
                     DataTable tabla = new DataTable();
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(tabla);
-
 
                     return tabla;
                 }
@@ -518,16 +512,100 @@ namespace REST_API.Resources
             }
             finally
             {
-
                 conn.Close();
             }
 
+        }
+
+        public static DataTable GetPatientReservations(Identification patientID)
+        {
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Obtener_reservaciones_por_paciente](@Paciente_ID)", conn);
+
+                cmd.Parameters.AddWithValue("@Paciente_ID", SqlDbType.NVarChar).Value = patientID.cedula;
+
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        public static bool DeleteReservation(ReservationID reservationID)
+        {
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[sp_Eliminar_Reservacion]", conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = reservationID.Reservation_ID;
+                
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;//Funciona
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        public static DataTable GetProcedures(Identification patientID)
+        {
+
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerProcedimientosReservacion]", conn);
+
+                cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
+
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
 
 
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+
+            }finally { conn.Close(); }
+
+
+            
+                
 
 
         }
 
+         
 
 
 

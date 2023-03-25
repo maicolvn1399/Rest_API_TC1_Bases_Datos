@@ -50,9 +50,83 @@ namespace REST_API.Controllers
             }
         }
 
+        [HttpGet("get_patient_reservations")]
+        public async Task<ActionResult<JSON_Object>> GetPatientReservations([FromQuery] Identification identification)
+        {
+            JSON_Object json = new JSON_Object("error", null);
+            try
+            {
+                DataTable patient_reservations = DatabaseConnection.GetPatientReservations(identification);
+                List<ReservationPatient> all_patient_reservations = new List<ReservationPatient>();
+
+
+
+                foreach (DataRow row in patient_reservations.Rows)
+                {
+                    ReservationPatient reservations = new ReservationPatient();
+                    int reservation_id_int = Convert.ToInt32(row["ID"].ToString());
+                    int cama_id_int = Convert.ToInt32(row["Cama_ID"].ToString());
+
+
+                    reservations.reservationId = reservation_id_int;
+                    reservations.fecha_ingreso = row["Fecha_ingreso"].ToString();
+                    reservations.fecha_salida = row["Fecha_salida"].ToString();
+                    reservations.cama_ID = cama_id_int;
+                    reservations.cedula_paciente = row["Paciente_ID"].ToString();
+
+                    all_patient_reservations.Add(reservations);
+
+
+                    List<string> procedures_list = new List<string>();
+
+                    DataTable procedures = DatabaseConnection.GetProcedures(identification);
+                    foreach (DataRow fila in procedures.Rows)
+                    {
+                        procedures_list.Add(fila["Procedimiento_nombre"].ToString());
+
+                    }
+                    reservations.procedimientos = procedures_list;
+
+                }
+
+                json.status = "ok";
+                json.result = all_patient_reservations;
+                return Ok(json);
+            
+
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(json);
+            }
+            
+
+        }
+
+        [HttpDelete("delete_reservation")]
+        public async Task<ActionResult<JSON_Object>> DeleteReservation(ReservationID reservationID)
+        {
+
+            JSON_Object json = new JSON_Object("error", null);
+            bool var = DatabaseConnection.DeleteReservation(reservationID);
+            Console.WriteLine(var);
+            if (var)
+            {
+                json.status = "ok";
+                return Ok(json);
+            }
+            else
+            {
+                
+                return BadRequest(json);
+            }
+
+        }
 
 
 
 
-    }
+
+
+        }
 }
