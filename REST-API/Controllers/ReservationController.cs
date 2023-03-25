@@ -14,18 +14,45 @@ namespace REST_API.Controllers
     public class ReservationController : ControllerBase
     {
         [HttpPost("create_reservation")]
-        public async Task<ActionResult<JSON_Object>> CreateReservation(Reservation new_reservation)
+        public async Task<ActionResult<JSON_Object>> CreateReservation(ReservationFields new_reservation)
         {
             JSON_Object json = new JSON_Object("ok", null);
 
-            bool var = DatabaseConnection.ExecuteCreateReservationProcedure(new_reservation);
+            bool var = DatabaseConnection.CreateReservation(new_reservation);
+            Console.WriteLine(var);
             if (var)
             {
                 return Ok(json);
             }
-            json.status = "error";
-            return Ok(json);
+            else
+            {
+                json.status = "error";
+                return BadRequest(json);
+            }
+
         }
-        
+
+        [HttpPost("insert_procedure_reservation")]
+        public async Task<ActionResult<JSON_Object>> InsertProcedureReservation(Reservation reservation)
+        {
+            JSON_Object json = new JSON_Object("ok", null);
+
+            bool var = DatabaseConnection.ExecuteCreateReservationProcedure(reservation);
+            Console.WriteLine(var);
+            if (var)
+            {
+                return Ok(json);
+            }
+            else
+            {
+                json.status = "error";
+                return BadRequest(json);
+            }
+        }
+
+
+
+
+
     }
 }

@@ -422,7 +422,119 @@ namespace REST_API.Resources
         }
 
 
+        public static bool DeletePatientPhone(NewPatientPhone patientPhoneToDelete)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+            try
+            {
+                conexion.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[sp_BorrarTelefonoPaciente]", conexion);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = patientPhoneToDelete.cedula;
+
+                cmd.Parameters.AddWithValue("@Telefono", SqlDbType.NVarChar).Value = patientPhoneToDelete.telefono;
+
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;
+
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                conexion.Close();
+            }
         }
 
-    
+
+        public static DataTable GetClinicalHistory(Identification identification)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conexion.Open();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[buscarHistorialClinico] (@cedula)", conexion);
+
+                cmd.Parameters.AddWithValue("@cedula", SqlDbType.NVarChar).Value = identification.cedula;
+                
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            finally
+            {
+                conexion.Close();
+            }
+        }
+
+
+        public static bool CreateReservation(ReservationFields reservation)
+        {
+
+
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+
+            DateTime dateTime = Convert.ToDateTime(reservation.fecha_ingreso);
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime);
+            string dbDate = dateOnly.ToString("dd/MM/yyyy");
+            Console.WriteLine(dbDate);
+            DateOnly dateOnly1 = DateOnly.ParseExact(dbDate, "dd/MM/yyyy");
+            Console.WriteLine(dateOnly1);
+            DateTime testDateTime = dateOnly1.ToDateTime(TimeOnly.Parse("12:00 AM"));
+            Console.WriteLine(testDateTime.GetType());
+            Console.WriteLine(testDateTime);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[BuscarCamaDisponible]", conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@Cedula", SqlDbType.NVarChar).Value = reservation.cedula;
+                cmd.Parameters.AddWithValue("@FechaIngreso", SqlDbType.Date).Value = dateTime;
+                
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;//Funciona
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+            finally
+            {
+
+                conn.Close();
+            }
+
+
+
+
+
+        }
+
+
+
+
+    }
+
+
 }
+
+    
+
