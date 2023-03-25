@@ -66,16 +66,18 @@ namespace REST_API.Resources
                 int i = cmd.ExecuteNonQuery();
                 //ExecuteAddPatientPhone(json);
 
+                /**
                 foreach (string phone in json.telefono)
                 {
                     ExecuteAddPatientPhone(cedula, phone);
                 }
-
+                **/
+                /**
                 foreach(Direccion direccion in json.direccion)
                 {
                     ExecuteAddPatientAddress(cedula,direccion.provincia, direccion.canton, direccion.distrito);
                 }
-
+                **/
                 return (i > 0) ? false : true;
 
             }
@@ -91,7 +93,7 @@ namespace REST_API.Resources
         }
 
 
-        public static bool ExecuteAddPatientPhone(string cedula, string telefono)
+        public static bool ExecuteAddPatientPhone(NewPatientPhone newPatientPhone)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
             try
@@ -102,10 +104,10 @@ namespace REST_API.Resources
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 
-                Console.WriteLine(cedula);
-                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = cedula;
-                Console.WriteLine(telefono);
-                cmd.Parameters.AddWithValue("@Telefono", SqlDbType.NVarChar).Value = telefono;
+                Console.WriteLine(newPatientPhone.cedula);
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = newPatientPhone.cedula;
+                Console.WriteLine(newPatientPhone.telefono);
+                cmd.Parameters.AddWithValue("@Telefono", SqlDbType.NVarChar).Value = newPatientPhone.telefono;
 
 
 
@@ -125,7 +127,7 @@ namespace REST_API.Resources
         }
 
 
-        public static bool ExecuteAddPatientAddress(string cedula,string provincia, string canton, string distrito)
+        public static bool ExecuteAddPatientAddress(Direccion address)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
             try
@@ -134,10 +136,10 @@ namespace REST_API.Resources
                 SqlCommand cmd = new SqlCommand("[dbo].[InsertarDireccionPaciente]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = cedula;
-                cmd.Parameters.AddWithValue("@Provincia", SqlDbType.NVarChar).Value = provincia;
-                cmd.Parameters.AddWithValue("@Canton", SqlDbType.NVarChar).Value = canton;
-                cmd.Parameters.AddWithValue("@Distrito", SqlDbType.NVarChar).Value = distrito;
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = address.cedula;
+                cmd.Parameters.AddWithValue("@Provincia", SqlDbType.NVarChar).Value = address.provincia;
+                cmd.Parameters.AddWithValue("@Canton", SqlDbType.NVarChar).Value = address.canton;
+                cmd.Parameters.AddWithValue("@Distrito", SqlDbType.NVarChar).Value = address.distrito;
 
                 int i = cmd.ExecuteNonQuery();
                 return (i > 0) ? true : false;
@@ -598,14 +600,40 @@ namespace REST_API.Resources
 
             }finally { conn.Close(); }
 
+        }
 
-            
-                
+        public static DataTable GetLastInsertedReservation(Identification patientID)
+        {
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[GetLastInsertedReservation]()", conn);
 
+                cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
+
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+
+            }
+            finally { conn.Close(); }
 
         }
 
-         
+
+
+
+
 
 
 

@@ -10,8 +10,6 @@
         public string fecha_nac { get; set; }
         public string sexo { get; set; } = string.Empty;
         public int edad { get; set; } = 0;
-        public List<string> telefono { get; set; }
-        public List<Direccion> direccion { get; set; }
 
     }
 }
