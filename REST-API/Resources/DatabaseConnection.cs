@@ -1,4 +1,6 @@
-﻿using REST_API.Models;
+﻿using Microsoft.AspNetCore.Components.Web;
+using REST_API.Models;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -38,10 +40,10 @@ namespace REST_API.Resources
             SqlConnection conn = new SqlConnection(cadenaConexion);
 
             DateTime dateTime = Convert.ToDateTime(json.fecha_nac);
-            DateOnly dateOnly = DateOnly.FromDateTime(dateTime); 
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime);
             string dbDate = dateOnly.ToString("yyyy-MM-dd");
             Console.WriteLine(dbDate);
-            DateOnly dateOnly1 = DateOnly.ParseExact(dbDate,"yyyy-MM-dd");
+            DateOnly dateOnly1 = DateOnly.ParseExact(dbDate, "yyyy-MM-dd");
             Console.WriteLine(dateOnly1);
             DateTime testDateTime = dateOnly1.ToDateTime(TimeOnly.Parse("12:00 AM"));
             Console.WriteLine(testDateTime);
@@ -69,12 +71,17 @@ namespace REST_API.Resources
                     ExecuteAddPatientPhone(cedula, phone);
                 }
 
+                foreach(Direccion direccion in json.direccion)
+                {
+                    ExecuteAddPatientAddress(cedula,direccion.provincia, direccion.canton, direccion.distrito);
+                }
+
                 return (i > 0) ? false : true;
 
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);  
+                Console.WriteLine(ex.Message);
                 return false;
             }
             finally
@@ -93,17 +100,17 @@ namespace REST_API.Resources
                 conn.Open();
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_InsertarTelefonoPaciente]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                
+
 
                 Console.WriteLine(cedula);
                 cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = cedula;
                 Console.WriteLine(telefono);
                 cmd.Parameters.AddWithValue("@Telefono", SqlDbType.NVarChar).Value = telefono;
-                
-                
+
+
 
                 int i = cmd.ExecuteNonQuery();
-                return (i > 0) ? false : true;
+                return (i > 0) ? true : false;
 
             }
             catch (Exception ex)
@@ -118,5 +125,304 @@ namespace REST_API.Resources
 
         }
 
-    }
+
+        public static bool ExecuteAddPatientAddress(string cedula,string provincia, string canton, string distrito)
+        {
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[InsertarDireccionPaciente]", conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = cedula;
+                cmd.Parameters.AddWithValue("@Provincia", SqlDbType.NVarChar).Value = provincia;
+                cmd.Parameters.AddWithValue("@Canton", SqlDbType.NVarChar).Value = canton;
+                cmd.Parameters.AddWithValue("@Distrito", SqlDbType.NVarChar).Value = distrito;
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? true : false;
+
+            } catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+        public static bool ExecuteAddClinicalHistory(ClinicalHistory newClinicalHistory)
+        {
+
+            DateTime dateTime = Convert.ToDateTime(newClinicalHistory.fecha_procedimiento);
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime);
+            string dbDate = dateOnly.ToString("dd/MM/yyyy");
+            Console.WriteLine(dbDate);
+            DateOnly dateOnly1 = DateOnly.ParseExact(dbDate, "dd/MM/yyyy");
+            Console.WriteLine(dateOnly1);
+            DateTime testDateTime = dateOnly1.ToDateTime(TimeOnly.Parse("12:00 AM"));
+            Console.WriteLine(testDateTime.GetType());
+            Console.WriteLine(testDateTime);
+
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[sp_InsertarHistorialClinico]", conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = newClinicalHistory.cedula_paciente;
+                cmd.Parameters.AddWithValue("@Fecha_procedimiento", SqlDbType.Date).Value = dateTime;
+                cmd.Parameters.AddWithValue("@Tratamiento", SqlDbType.NVarChar).Value = newClinicalHistory.tratamiento;
+                cmd.Parameters.AddWithValue("@Procedimiento_nombre", SqlDbType.NVarChar).Value = newClinicalHistory.nombre_procedimiento;
+                cmd.Parameters.AddWithValue("@Personal_cedula", SqlDbType.NVarChar).Value = newClinicalHistory.cedula_personal;
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;//Funciona
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+            finally
+            {
+
+                conn.Close();
+            }
+        }
+
+
+
+        public static bool ExecuteUpdateClinicalHistory(UpdatedClinicalHistory updatedClinicalHistory)
+        {
+
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+
+            DateTime dateTime = Convert.ToDateTime(updatedClinicalHistory.fecha_procedimiento);
+            DateOnly dateOnly = DateOnly.FromDateTime(dateTime);
+            string dbDate = dateOnly.ToString("dd/MM/yyyy");
+            Console.WriteLine(dbDate);
+            DateOnly dateOnly1 = DateOnly.ParseExact(dbDate, "dd/MM/yyyy");
+            Console.WriteLine(dateOnly1);
+            DateTime testDateTime = dateOnly1.ToDateTime(TimeOnly.Parse("12:00 AM"));
+            Console.WriteLine(testDateTime.GetType());
+            Console.WriteLine(testDateTime);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[sp_ActualizarHistorialClinico]", conn);
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+
+                cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = updatedClinicalHistory.cedula_paciente;
+                cmd.Parameters.AddWithValue("@Fecha_procedimiento", SqlDbType.Date).Value = dateTime;
+                cmd.Parameters.AddWithValue("@Tratamiento", SqlDbType.NVarChar).Value = updatedClinicalHistory.tratamiento;
+
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;//Funciona
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+            finally
+            {
+
+                conn.Close();
+            }
+
+        }
+
+
+
+        public static DataTable Login(Credentials login_credentials)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conexion.Open();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Paciente_Login] (@Cedula, @Password)", conexion);
+               
+                cmd.Parameters.AddWithValue("@Cedula", SqlDbType.NVarChar).Value = login_credentials.cedula;
+                cmd.Parameters.AddWithValue("@Password", SqlDbType.NVarChar).Value = login_credentials.password;
+
+
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine (ex.Message); 
+                return null;
+            }
+            finally
+            {
+                conexion.Close();
+            }
+
+        }
+
+        public static DataTable GetPhones(Credentials login_credentials, string auth_side)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+
+            if (auth_side == "patient_auth")
+            {
+                try
+                {
+
+                    conexion.Open();
+                    SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerTelefonosPaciente]", conexion);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = login_credentials.cedula;
+
+                    DataTable tabla = new DataTable();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(tabla);
+
+
+                    return tabla;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+                finally
+                {
+                    conexion.Close();
+                }
+            }
+            else
+            {
+                try
+                {
+
+                    conexion.Open();
+                    SqlCommand cmd = new SqlCommand("[dbo].[Obtener_Telefonos_Personal]", conexion);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                    cmd.Parameters.AddWithValue("@cedula_personal", SqlDbType.NVarChar).Value = login_credentials.cedula;
+
+                    DataTable tabla = new DataTable();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(tabla);
+
+
+                    return tabla;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+                finally
+                {
+                    conexion.Close();
+                }
+
+
+            }
+
+        }
+
+
+
+        public static DataTable GetAddress(Credentials login_credentials,string auth_side)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+
+            if(auth_side == "patient_auth")
+            {
+                try
+                {
+                    conexion.Open();
+                    SqlCommand cmd = new SqlCommand("[dbo].[Obtener_Direccion_Paciente]", conexion);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@cedula_paciente", SqlDbType.NVarChar).Value = login_credentials.cedula;
+                    DataTable tabla = new DataTable();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(tabla);
+
+
+                    return tabla;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+                finally { conexion.Close(); }
+            }
+            else
+            {
+                try
+                {
+                    conexion.Open();
+                    SqlCommand cmd = new SqlCommand("[dbo].[Obtener_Direccion_Personal]", conexion);
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@cedula_personal", SqlDbType.NVarChar).Value = login_credentials.cedula;
+                    DataTable tabla = new DataTable();
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(tabla);
+
+
+                    return tabla;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
+                finally { conexion.Close(); }
+            }
+           
+        }
+
+        public static DataTable LoginWorker(Credentials login_credentials)
+        {
+            SqlConnection conexion = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conexion.Open();
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Personal_Login] (@Cedula, @Password)", conexion);
+
+                cmd.Parameters.AddWithValue("@Cedula", SqlDbType.NVarChar).Value = login_credentials.cedula;
+                cmd.Parameters.AddWithValue("@Password", SqlDbType.NVarChar).Value = login_credentials.password;
+
+
+                DataTable tabla = new DataTable();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(tabla);
+
+                return tabla;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+            finally
+            {
+                conexion.Close();
+            }
+
+        }
+
+
+        }
+
+    
 }

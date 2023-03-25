@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using REST_API.Models;
+using System.Data;
 using System.Data.SqlClient;
 
 namespace REST_API.Resources
@@ -110,6 +111,9 @@ namespace REST_API.Resources
                 conexion.Close();
             }
         }
+
+        
+
     }
 }
 

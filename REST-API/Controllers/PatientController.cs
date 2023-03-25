@@ -25,10 +25,6 @@ namespace REST_API.Controllers
                 json.status = "error";
                 return BadRequest(json);
             }
-            
-            
-
-
 
         }
 
@@ -89,7 +85,6 @@ namespace REST_API.Controllers
             return Ok(json);
 
         }
-
 
     }
 }
