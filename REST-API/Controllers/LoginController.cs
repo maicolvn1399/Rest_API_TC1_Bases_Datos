@@ -65,10 +65,6 @@ namespace REST_API.Controllers
                     addresses.Add(address);
                 }
 
-
-                information_patient.telefono = phone_list;
-                information_patient.direccion = addresses;
-
                 string info_phones_patient = JsonConvert.SerializeObject(phones_patient);
                 Console.WriteLine(info_phones_patient);
                 json.status = "ok";

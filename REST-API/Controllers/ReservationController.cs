@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using REST_API.Models;
 using REST_API.Resources;
 using System.Data;
@@ -123,8 +124,50 @@ namespace REST_API.Controllers
 
         }
 
-        
+        [HttpGet("get_last_inserted_reservation")]
+        public async Task<ActionResult<JSON_Object>> GetLastInsertedReservation()
+        {
+            JSON_Object json = new JSON_Object("error", null);
 
+            try
+            {
+                DataTable last_reservation = DatabaseConnection.GetLastInsertedReservation();
+
+
+
+
+                LastInsertedReservation lastInserted = new LastInsertedReservation();
+                foreach (DataRow row in last_reservation.Rows)
+                {
+                    
+
+                    int id_int = Convert.ToInt32(row["ID"].ToString());
+                    int cama_id_int = Convert.ToInt32(row["Cama_ID"].ToString());
+                    int paciente_id_int = Convert.ToInt32(row["Paciente_ID"].ToString());
+
+
+                    lastInserted.ID = id_int; 
+                    lastInserted.fecha_ingreso = row["fecha_ingreso"].ToString();
+                    lastInserted.fecha_salida = row["fecha_salida"].ToString();
+                    lastInserted.cama_ID = cama_id_int;
+                    lastInserted.paciente_ID = paciente_id_int;
+
+                }
+
+                json.status = "ok";
+                json.result = lastInserted;
+                return Ok(json);
+
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return BadRequest(json);
+            }
+
+
+        }
 
 
 

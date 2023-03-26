@@ -22,6 +22,9 @@ namespace REST_API.Resources
                 cmd.Parameters.AddWithValue("@Reservacion_ID", SqlDbType.Int).Value = json.reservacion_ID;
                 cmd.Parameters.AddWithValue("@Procedimiento_nombre", SqlDbType.NVarChar).Value = json.procedimiento_nombre;
                 int i = cmd.ExecuteNonQuery();
+
+                UpdateDischargeDate();
+
                 return (i > 0) ? true : false;
 
             }
@@ -585,6 +588,7 @@ namespace REST_API.Resources
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerProcedimientosReservacion]", conn);
 
                 cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
+              
 
                 DataTable tabla = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -602,22 +606,20 @@ namespace REST_API.Resources
 
         }
 
-        public static DataTable GetLastInsertedReservation(Identification patientID)
+        public static DataTable GetLastInsertedReservation()
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
             try
             {
                 conn.Open();
-                SqlCommand cmd = new SqlCommand("[dbo].[GetLastInsertedReservation]()", conn);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[GetLastInsertedReservation]()", conn);
 
-                cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
 
                 DataTable tabla = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(tabla);
 
                 return tabla;
-
 
             }
             catch (Exception ex)
@@ -627,6 +629,33 @@ namespace REST_API.Resources
 
             }
             finally { conn.Close(); }
+
+        }
+
+        public static bool UpdateDischargeDate()
+        {
+
+            SqlConnection conn = new SqlConnection(cadenaConexion);
+
+            try
+            {
+                conn.Open();
+                SqlCommand cmd = new SqlCommand("[dbo].[Actualizar_Fecha_Salida]", conn);
+
+                int i = cmd.ExecuteNonQuery();
+                return (i > 0) ? false : true;//Funciona
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+
+            }
+            finally
+            {
+                conn.Close();
+            }
 
         }
 
