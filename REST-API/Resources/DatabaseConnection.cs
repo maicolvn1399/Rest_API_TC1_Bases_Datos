@@ -21,9 +21,11 @@ namespace REST_API.Resources
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@Reservacion_ID", SqlDbType.Int).Value = json.reservacion_ID;
                 cmd.Parameters.AddWithValue("@Procedimiento_nombre", SqlDbType.NVarChar).Value = json.procedimiento_nombre;
+                UpdateDischargeDate();
+
                 int i = cmd.ExecuteNonQuery();
 
-                UpdateDischargeDate();
+                
 
                 return (i > 0) ? true : false;
 
@@ -115,7 +117,7 @@ namespace REST_API.Resources
 
 
                 int i = cmd.ExecuteNonQuery();
-                return (i > 0) ? true : false;
+                return (i > 0) ? false : true;
 
             }
             catch (Exception ex)
@@ -242,7 +244,6 @@ namespace REST_API.Resources
             }
 
         }
-
 
 
         public static DataTable Login(Credentials login_credentials)
@@ -588,7 +589,7 @@ namespace REST_API.Resources
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerProcedimientosReservacion]", conn);
 
                 cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
-              
+               
 
                 DataTable tabla = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
