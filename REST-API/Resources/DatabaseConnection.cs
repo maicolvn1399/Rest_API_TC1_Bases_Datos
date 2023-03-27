@@ -10,6 +10,8 @@ namespace REST_API.Resources
     {
         public static string cadenaConexion = "Data Source=LAPTOP_MICHAEL;Initial Catalog=Tarea_Corta_1;Persist Security Info=True;User ID=michael;Password=abc13";
 
+
+        //Metodo que llama a un stored procedure en SQL para insertar una nueva reservacion en la base
         public static bool ExecuteCreateReservationProcedure(Reservation json)
         {
 
@@ -17,13 +19,17 @@ namespace REST_API.Resources
             try
             {
                 conn.Open();
+                //Llamada al stored procedure 
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_InsertarProcedimientoReservacion]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                //Parametros que recibe el stored procedure para poder ser ejecutado 
                 cmd.Parameters.AddWithValue("@Reservacion_ID", SqlDbType.Int).Value = json.reservacion_ID;
                 cmd.Parameters.AddWithValue("@Procedimiento_nombre", SqlDbType.NVarChar).Value = json.procedimiento_nombre;
+                UpdateDischargeDate();
+
                 int i = cmd.ExecuteNonQuery();
 
-                UpdateDischargeDate();
+                
 
                 return (i > 0) ? true : false;
 
@@ -38,6 +44,7 @@ namespace REST_API.Resources
             }
         }
 
+        //Metodo que llama a un stored procedure en SQL para insertar un nuevo paciente
         public static bool ExecuteAddPatient(Patient json)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
@@ -55,9 +62,11 @@ namespace REST_API.Resources
             try
             {
                 conn.Open();
+                //llamada al stored procedure 
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_Insertar_Paciente]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+                //Parametros que recibe el stored procedure 
                 cmd.Parameters.AddWithValue("@Cedula", SqlDbType.NVarChar).Value = json.cedula;
                 cmd.Parameters.AddWithValue("@Nombre", SqlDbType.NVarChar).Value = json.nombre;
                 cmd.Parameters.AddWithValue("@Apellido1", SqlDbType.NVarChar).Value = json.apellido_1;
@@ -96,6 +105,7 @@ namespace REST_API.Resources
         }
 
 
+        //Metodo que llama a un stored procedure en SQL para insertar un nuevo telefono asociado a un paciente
         public static bool ExecuteAddPatientPhone(NewPatientPhone newPatientPhone)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
@@ -103,11 +113,13 @@ namespace REST_API.Resources
             {
 
                 conn.Open();
+                //llamada al stored procedure 
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_InsertarTelefonoPaciente]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 
                 Console.WriteLine(newPatientPhone.cedula);
+                //parametros del stored procedure para ser ejecutado
                 cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = newPatientPhone.cedula;
                 Console.WriteLine(newPatientPhone.telefono);
                 cmd.Parameters.AddWithValue("@Telefono", SqlDbType.NVarChar).Value = newPatientPhone.telefono;
@@ -115,7 +127,7 @@ namespace REST_API.Resources
 
 
                 int i = cmd.ExecuteNonQuery();
-                return (i > 0) ? true : false;
+                return (i > 0) ? false : true;
 
             }
             catch (Exception ex)
@@ -130,15 +142,20 @@ namespace REST_API.Resources
         }
 
 
+        //Metodo que llama a un stored procedure en SQL para insertar una nueva direccion asociada a un paciente
+
         public static bool ExecuteAddPatientAddress(Direccion address)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
             try
             {
                 conn.Open();
+                //llamada al stored procedure
                 SqlCommand cmd = new SqlCommand("[dbo].[InsertarDireccionPaciente]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+
+                //Parametros del stored procedure para ser ejecutado
                 cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = address.cedula;
                 cmd.Parameters.AddWithValue("@Provincia", SqlDbType.NVarChar).Value = address.provincia;
                 cmd.Parameters.AddWithValue("@Canton", SqlDbType.NVarChar).Value = address.canton;
@@ -158,6 +175,8 @@ namespace REST_API.Resources
             }
         }
 
+        //Metodo que llama a un stored procedure en SQL para insertar un nuevo registro de historial clinico a un paciente
+
         public static bool ExecuteAddClinicalHistory(ClinicalHistory newClinicalHistory)
         {
 
@@ -175,9 +194,11 @@ namespace REST_API.Resources
             try
             {
                 conn.Open();
+                //llamada al stored procedure 
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_InsertarHistorialClinico]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+                //Parametros que recibe el stored procedure para ser ejecutado
                 cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = newClinicalHistory.cedula_paciente;
                 cmd.Parameters.AddWithValue("@Fecha_procedimiento", SqlDbType.Date).Value = dateTime;
                 cmd.Parameters.AddWithValue("@Tratamiento", SqlDbType.NVarChar).Value = newClinicalHistory.tratamiento;
@@ -199,6 +220,7 @@ namespace REST_API.Resources
             }
         }
 
+        //Metodo que llama a un stored procedure en SQL para actualizar un registro de historial clinico a un paciente
 
         public static bool ExecuteUpdateClinicalHistory(UpdatedClinicalHistory updatedClinicalHistory)
         {
@@ -217,17 +239,18 @@ namespace REST_API.Resources
             try
             {
                 conn.Open();
+                //llamada al stored procedure
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_ActualizarHistorialClinico]", conn);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
-
+                //parametros que recibe el stored procedure
                 cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = updatedClinicalHistory.cedula_paciente;
                 cmd.Parameters.AddWithValue("@Fecha_procedimiento", SqlDbType.Date).Value = dateTime;
                 cmd.Parameters.AddWithValue("@Tratamiento", SqlDbType.NVarChar).Value = updatedClinicalHistory.tratamiento;
 
 
                 int i = cmd.ExecuteNonQuery();
-                return (i > 0) ? false : true;//Funciona
+                return (i > 0) ? false : true;//
 
             }
             catch (Exception ex)
@@ -243,8 +266,8 @@ namespace REST_API.Resources
 
         }
 
-
-
+        //Metodo para hacer login en cualquier vista de la web app
+        //Retorna un datatable con la informacion del paciente
         public static DataTable Login(Credentials login_credentials)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -252,8 +275,10 @@ namespace REST_API.Resources
             try
             {
                 conexion.Open();
+                //Llamada a la funcion 
                 SqlCommand cmd = new SqlCommand("SELECT * FROM [dbo].[Paciente_Login] (@Cedula, @Password)", conexion);
                
+                //Parametros que recibe la funcion 
                 cmd.Parameters.AddWithValue("@Cedula", SqlDbType.NVarChar).Value = login_credentials.cedula;
                 cmd.Parameters.AddWithValue("@Password", SqlDbType.NVarChar).Value = login_credentials.password;
 
@@ -276,6 +301,8 @@ namespace REST_API.Resources
 
         }
 
+        //Metodo que obtiene los telefonos asociados a un paciente 
+        //Retorna un datatable con los telefonos
         public static DataTable GetPhones(Credentials login_credentials, string auth_side)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -286,9 +313,11 @@ namespace REST_API.Resources
                 {
 
                     conexion.Open();
+                    //LLamada al stored procedure 
                     SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerTelefonosPaciente]", conexion);
                     cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
+                    //Parametro que recibe el stored procedure 
                     cmd.Parameters.AddWithValue("@Paciente_cedula", SqlDbType.NVarChar).Value = login_credentials.cedula;
 
                     DataTable tabla = new DataTable();
@@ -340,7 +369,8 @@ namespace REST_API.Resources
         }
 
 
-
+        //Metodo que obtiene las direcciones asociados a una persona 
+        //Retorna un datatable con las direcciones
         public static DataTable GetAddress(Credentials login_credentials,string auth_side)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -389,6 +419,8 @@ namespace REST_API.Resources
            
         }
 
+
+        
         public static DataTable LoginWorker(Credentials login_credentials)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -420,13 +452,14 @@ namespace REST_API.Resources
 
         }
 
-
+        //Metodo que permite eliminar un telefono asociado a un paciente
         public static bool DeletePatientPhone(NewPatientPhone patientPhoneToDelete)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
             try
             {
                 conexion.Open();
+                //Llamada al stored procedure que permite eliminar el telefono
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_BorrarTelefonoPaciente]", conexion);
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
@@ -450,7 +483,7 @@ namespace REST_API.Resources
             }
         }
 
-
+        //Metodo que retorna un datatable con los datos del historial medico de un paciente
         public static DataTable GetClinicalHistory(Identification identification)
         {
             SqlConnection conexion = new SqlConnection(cadenaConexion);
@@ -479,7 +512,7 @@ namespace REST_API.Resources
             }
         }
 
-
+        //Metodo que permite hacer una reservacion en la vista paciente
         public static bool CreateReservation(ReservationFields reservation)
         {
 
@@ -522,6 +555,7 @@ namespace REST_API.Resources
 
         }
 
+        //Metodo que permite obtener las reservaciones que hace un paciente
         public static DataTable GetPatientReservations(Identification patientID)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
@@ -550,6 +584,8 @@ namespace REST_API.Resources
             }
         }
 
+        //Metodo que permite eliminar una reservacion del paciente
+        //Toma como parametro el numero de reservacion que se desea eliminar
         public static bool DeleteReservation(ReservationID reservationID)
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
@@ -578,6 +614,8 @@ namespace REST_API.Resources
             }
         }
 
+
+        //Metodo que permite obtener los procedimientos que se hace un paciente
         public static DataTable GetProcedures(Identification patientID)
         {
 
@@ -588,7 +626,7 @@ namespace REST_API.Resources
                 SqlCommand cmd = new SqlCommand("[dbo].[sp_ObtenerProcedimientosReservacion]", conn);
 
                 cmd.Parameters.AddWithValue("@reservacion_id", SqlDbType.NVarChar).Value = patientID.cedula;
-              
+               
 
                 DataTable tabla = new DataTable();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -606,6 +644,8 @@ namespace REST_API.Resources
 
         }
 
+
+        //Metodo que obtiene una tupla con la informacion de la ultima reservacion registrada
         public static DataTable GetLastInsertedReservation()
         {
             SqlConnection conn = new SqlConnection(cadenaConexion);
@@ -632,6 +672,8 @@ namespace REST_API.Resources
 
         }
 
+
+        //Metodo que actualiza la fecha de salida de un paciente
         public static bool UpdateDischargeDate()
         {
 

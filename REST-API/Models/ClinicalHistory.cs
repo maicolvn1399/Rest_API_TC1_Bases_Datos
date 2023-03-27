@@ -1,5 +1,8 @@
 ﻿namespace REST_API.Models
 {
+
+
+    //Modelo que permite crear un JSON para representar los datos de un historial medico
     public class ClinicalHistory
     {
 

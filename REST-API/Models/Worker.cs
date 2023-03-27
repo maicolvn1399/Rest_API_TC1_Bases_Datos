@@ -1,5 +1,7 @@
 ﻿namespace REST_API.Models
 {
+
+    //Modelo que permite crear un JSON para representar los datos del personal
     public class Worker
     {
         public string cedula { get; set; } = string.Empty;
