@@ -1,5 +1,7 @@
 ﻿namespace REST_API.Models
 {
+
+    //Modelo que permite crear un JSON para representar los datos de una direccion de un paciente o doctor
     public class Direccion
     {
 

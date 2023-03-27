@@ -9,12 +9,16 @@ namespace REST_API.Controllers
     [Route("api")]
     public class ClinicalHistoryController : ControllerBase
     {
+
+        //Metodo para añadir una nueva entrada al historial clinico de un paciente
+        //Se recibe un JSON con los campos del historial clinico 
+
         [HttpPost("add_clinical_history")]
         public async Task<ActionResult<JSON_Object>> AddClinicalHistory(ClinicalHistory newClinicalHistory)
         {
             //Guardar el historial medico 
             JSON_Object json = new JSON_Object("ok", null);
-            bool var = DatabaseConnection.ExecuteAddClinicalHistory(newClinicalHistory);
+            bool var = DatabaseConnection.ExecuteAddClinicalHistory(newClinicalHistory); //Se llama al metodo que ejecuta el stored procedure para guardar el historial nuevo 
             Console.WriteLine(var);
             if (var)
             {
@@ -28,13 +32,16 @@ namespace REST_API.Controllers
 
 
         }
+
+        //Metodo para actualizar una entrada al historial clinico de un paciente
+        //Se recibe un JSON con los campos del historial clinico que se quieren modificar
 
         [HttpPut("update_clinical_history")]
         public async Task<ActionResult<JSON_Object>> UpdateClinicalHistory(UpdatedClinicalHistory updatedClinicalHistory)
         {
             //Actualizar el historial medico 
             JSON_Object json = new JSON_Object("ok", null);
-            bool var = DatabaseConnection.ExecuteUpdateClinicalHistory(updatedClinicalHistory);
+            bool var = DatabaseConnection.ExecuteUpdateClinicalHistory(updatedClinicalHistory); //Se llama al metodo que ejecuta al stored procedure para actualizar datos del historial clinico 
             Console.WriteLine(var);
             if (var)
             {
@@ -49,13 +56,16 @@ namespace REST_API.Controllers
         }
 
 
-
+        //Método para obtener un objeto JSON con una lista de JSONs que representan cada entrada del historial clinico de un paciente 
+        //Se recibe como parametro un JSON que contiene la idetificacion del paciente que se desea consultar
         [HttpGet("get_history")]
         public async Task<ActionResult<JSON_Object>> GetHistory([FromQuery] Identification identification)
         {
             //Buscar en la base el historial medico con la identificacion y retornar el historial 
             
-            DataTable patient_history = DatabaseConnection.GetClinicalHistory(identification);
+            DataTable patient_history = DatabaseConnection.GetClinicalHistory(identification); //Se ejecuta el método que llama al stored procedure o funcion que devuelve una DataTable con la informacion 
+            
+            //Se crea una lista para almacenar la informacion de cada tupla obtenida en el objeto DataTable
             List<ClinicalHistory> all_history = new List<ClinicalHistory>();
             foreach (DataRow row in patient_history.Rows) 
             {

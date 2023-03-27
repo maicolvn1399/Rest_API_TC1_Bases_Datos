@@ -9,16 +9,18 @@ using System.Data.SqlClient;
 
 namespace REST_API.Controllers
 {
-
+    //Controlador que permite gestionar las reservaciones que hace un paciente 
     [ApiController]
     [Route("api")]
     public class ReservationController : ControllerBase
     {
+        //Metodo que permite crear una reservacion 
+        //Se recibe como parametro un JSON que contiene el numero de cedula del paciente y la fecha de reservacion 
         [HttpPost("create_reservation")]
         public async Task<ActionResult<JSON_Object>> CreateReservation(ReservationFields new_reservation)
         {
             JSON_Object json = new JSON_Object("ok", null);
-
+            //Se ejecuta el metodo que llama a un stored procedure en SQL para agregar una tupla que representa la reservacion 
             bool var = DatabaseConnection.CreateReservation(new_reservation);
             Console.WriteLine(var);
             if (var)
@@ -33,11 +35,13 @@ namespace REST_API.Controllers
 
         }
 
+
+        //Metodo que permite insertar una reservacion y el procedimiento que se va a hacer el paciente
         [HttpPost("insert_procedure_reservation")]
         public async Task<ActionResult<JSON_Object>> InsertProcedureReservation(Reservation reservation)
         {
             JSON_Object json = new JSON_Object("ok", null);
-
+            //Metodo que ejecuta un stored procedure en SQL y guarda la informacion en la tabla correspondiente
             bool var = DatabaseConnection.ExecuteCreateReservationProcedure(reservation);
             Console.WriteLine(var);
             if (var)
@@ -51,6 +55,8 @@ namespace REST_API.Controllers
             }
         }
 
+
+        
         [HttpGet("get_patient_reservations")]
         public async Task<ActionResult<JSON_Object>> GetPatientReservations([FromQuery] Identification identification)
         {
@@ -104,11 +110,14 @@ namespace REST_API.Controllers
 
         }
 
+        //Metodo que permite eliminar una reservacion de la base de datos 
+        //Recibe un parametro que corresponde a un JSON con la cedula de un paciente
         [HttpDelete("delete_reservation")]
         public async Task<ActionResult<JSON_Object>> DeleteReservation(ReservationID reservationID)
         {
 
             JSON_Object json = new JSON_Object("error", null);
+            //Ejecuta el método que llama a un stored procedure en SQL para eliminar la reservacion 
             bool var = DatabaseConnection.DeleteReservation(reservationID);
             Console.WriteLine(var);
             if (var)
@@ -124,6 +133,7 @@ namespace REST_API.Controllers
 
         }
 
+        //Metodo que devuelve la ultima reservacion insertada para actualizar la fecha de salida del paciente 
         [HttpGet("get_last_inserted_reservation")]
         public async Task<ActionResult<JSON_Object>> GetLastInsertedReservation()
         {
@@ -131,10 +141,9 @@ namespace REST_API.Controllers
 
             try
             {
+                //El metodo retorna una estructura de tipo DataTable que contiene la informacion de la 
+                //ultima reservacion insertada
                 DataTable last_reservation = DatabaseConnection.GetLastInsertedReservation();
-
-
-
 
                 LastInsertedReservation lastInserted = new LastInsertedReservation();
                 foreach (DataRow row in last_reservation.Rows)

@@ -7,12 +7,16 @@ using System.Linq.Expressions;
 
 namespace REST_API.Controllers
 {
-
+    //Controlador del API que permite gestionar Logins de la vista paciente y doctor
     [ApiController]
     [Route("api")]
     public class LoginController : ControllerBase
     {
 
+
+        //Metodo para autenticar al paciente 
+        //Se recibe como parametro un JSON con las credenciales del paciente (cedula y password) 
+        //Se retorna un JSON con la informacion del paciente si este es encontrado en la base y la contraseña hace match con la que se proporciona 
         [HttpGet("auth_patient")]
         public async Task<ActionResult<JSON_Object>> AuthPatient([FromQuery] Credentials patient_credentials)
         {
@@ -22,12 +26,12 @@ namespace REST_API.Controllers
             {
                 Patient information_patient = new Patient();
 
-                DataTable login_data = DatabaseConnection.Login(patient_credentials);
+                DataTable login_data = DatabaseConnection.Login(patient_credentials); //Llamada al metodo que ejecuta la funcion en SQL que retorna una tabla con la informacion del paciente
 
                 DataRow dataRow = login_data.Rows[0];
 
                 int patient_age = Convert.ToInt32(dataRow["Edad"]);
-
+                //Conversion de tipo de datos de DataTable a objeto tipo Patient para crear el JSON que retorna el método
                 information_patient.cedula = dataRow["Cedula"].ToString();
                 information_patient.nombre = dataRow["Nombre"].ToString();
                 information_patient.apellido_1 = dataRow["Apellido1"].ToString();
@@ -40,33 +44,7 @@ namespace REST_API.Controllers
                 string info_patient = JsonConvert.SerializeObject(login_data);
                 Console.WriteLine(info_patient);
 
-                List<string> phone_list = new List<string>();
 
-                DataTable phones_patient = DatabaseConnection.GetPhones(patient_credentials, "patient_auth");
-                foreach (DataRow row in phones_patient.Rows)
-                {
-                    foreach (var item in row.ItemArray)
-                    {
-                        Console.WriteLine(item.ToString());
-                        phone_list.Add(item.ToString());
-                    }
-                }
-
-
-                List<Direccion> addresses = new List<Direccion>();
-
-                DataTable address_patient = DatabaseConnection.GetAddress(patient_credentials,"patient_auth");
-                foreach (DataRow row in address_patient.Rows)
-                {
-                    Direccion address = new Direccion();
-                    address.provincia = row["Provincia"].ToString();
-                    address.canton = row["Canton"].ToString();
-                    address.distrito = row["Distrito"].ToString();
-                    addresses.Add(address);
-                }
-
-                string info_phones_patient = JsonConvert.SerializeObject(phones_patient);
-                Console.WriteLine(info_phones_patient);
                 json.status = "ok";
                 json.result = information_patient;
 
@@ -81,6 +59,10 @@ namespace REST_API.Controllers
             
         }
 
+
+        //Metodo para autenticar al doctor o personal 
+        //Se recibe como parametro un JSON con las credenciales del doctir  (cedula y password) 
+        //Se retorna un JSON con la informacion del doctor si este es encontrado en la base y la contraseña hace match con la que se proporciona 
         [HttpGet("auth_worker")]
         public async Task<ActionResult<JSON_Object>> AuthWorker([FromQuery] Credentials worker_credentials)
         {
@@ -90,10 +72,10 @@ namespace REST_API.Controllers
             {
                 Worker information_worker = new Worker();
 
-                DataTable login_data_worker = DatabaseConnection.LoginWorker(worker_credentials);
+                DataTable login_data_worker = DatabaseConnection.LoginWorker(worker_credentials);//Llamada al metodo que ejecuta la funcion en SQL que retorna una tabla con la informacion del doctor
 
                 DataRow dataRow = login_data_worker.Rows[0];
-
+                //Conversion de tipo de datos de DataTable a objeto tipo Worker para crear el JSON que retorna el método
                 information_worker.cedula = dataRow["Cedula"].ToString();
                 information_worker.password = dataRow["Password"].ToString();
                 information_worker.nombre = dataRow["Nombre"].ToString();
@@ -105,7 +87,7 @@ namespace REST_API.Controllers
 
 
                 List<string> phone_list_worker = new List<string>();
-
+                //Obtencion de telefonos pertenecientes a un doctor o personal 
                 DataTable phones_worker = DatabaseConnection.GetPhones(worker_credentials, "worker_auth");
                 foreach (DataRow row in phones_worker.Rows)
                 {
@@ -117,7 +99,7 @@ namespace REST_API.Controllers
                 }
 
                 List<Direccion> addresses = new List<Direccion>();
-
+                //Obtencion de direcciones asociadas a un doctor o personal
                 DataTable address_worker = DatabaseConnection.GetAddress(worker_credentials, "worker_auth");
                 foreach (DataRow row in address_worker.Rows)
                 {
